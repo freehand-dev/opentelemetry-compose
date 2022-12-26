@@ -1,0 +1,45 @@
+receivers:
+  otlp:
+    protocols:
+      grpc:
+      
+processors:
+    
+# Configure exporters    
+exporters:
+  # Export prometheus endpoint
+  prometheus:
+    endpoint: "0.0.0.0:9464"
+    metric_expiration: 1m
+   
+  # log to the console 
+  logging:
+    verbosity: detailed
+    sampling_initial: 5
+    sampling_thereafter: 200
+  
+extensions:
+  health_check:
+  
+# Configure pipelines. Pipeline defines a path the data follows in the Collector
+# starting from reception, then further processing or modification and finally
+# exiting the Collector via exporters.
+# https://opentelemetry.io/docs/collector/configuration/#service
+# https://github.com/open-telemetry/opentelemetry-collector/blob/main/docs/design.md#pipelines
+service:
+  extensions: [health_check]
+  pipelines:
+    traces:
+      receivers: [otlp]
+      processors: []
+      exporters: [logging]
+    metrics:
+      receivers: [otlp]
+      processors: []
+      exporters: [logging, prometheus]
+    logs:
+      receivers: [otlp]
+      processors: []
+      exporters: [logging]
+      
+      
